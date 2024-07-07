@@ -1,0 +1,11 @@
+{
+  "Lambda Invoke": {
+    "Type": "Task",
+    "Resource": "arn:aws:states:::lambda:invoke",
+    "Parameters": {
+      "Payload.$": "$",
+      "FunctionName": "${ProcessingLambda}"
+    },
+    "End": true
+  }
+}

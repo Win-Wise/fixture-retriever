@@ -1,0 +1,35 @@
+terraform {
+  cloud {
+    organization = "arbriver"
+
+    workspaces {
+      name = "fixture-retriever"
+    }
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.55.0"
+    }
+  }
+  required_version = ">= 1.1.0"
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+module "base"{
+  source = "./base"
+}
+
+module "first-function" {
+  source = "./functions/first-function"
+  lambda_role = module.base.lambda_execution_role
+  lambda_layer = module.base.lambda_layer
+}
+
+module "statemachine"{
+  source = "./statemachine"
+  processing_lambda = module.first-function
+}
