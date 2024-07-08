@@ -19,47 +19,47 @@ resource "aws_iam_role" "StateMachineRole" {
   assume_role_policy = data.aws_iam_policy_document.state_machine_assume_role_policy.json
 }
 
-data "aws_iam_policy_document" "state_machine_role_policy" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:DescribeLogGroups"
+resource "aws_iam_policy" "statemachine_logging_policy" {
+  name   = "statemachine-logging-policy"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        Action : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect : "Allow",
+        Resource : "arn:aws:logs:*:*:*"
+      },
+      {
+        Action : [
+          "logs:CreateLogDelivery",
+          "logs:CreateLogStream",
+          "logs:GetLogDelivery",
+          "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutLogEvents",
+          "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies",
+          "logs:DescribeLogGroups"
+        ],
+        Effect : "Allow",
+        Resource : "*"
+      },
+      {
+        Action: [
+          "lambda:InvokeFunction"
+        ],
+        Effect: "Allow",
+        Resource: var.processing_lambda.lambda.arn
+      }
     ]
-
-    resources = ["${aws_cloudwatch_log_group.MySFNLogGroup.arn}:*"]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "cloudwatch:PutMetricData",
-      "logs:CreateLogDelivery",
-      "logs:GetLogDelivery",
-      "logs:UpdateLogDelivery",
-      "logs:DeleteLogDelivery",
-      "logs:ListLogDeliveries",
-      "logs:PutResourcePolicy",
-      "logs:DescribeResourcePolicies",
-    ]
-    resources = ["*"]
-  }
-
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "lambda:InvokeFunction"
-    ]
-
-    resources = [var.processing_lambda.lambda.arn]
-  }
+  })
 }
 
-# Create an IAM policy for the Step Functions state machine
-resource "aws_iam_role_policy" "StateMachinePolicy" {
-  role   = aws_iam_role.StateMachineRole.id
-  policy = data.aws_iam_policy_document.state_machine_role_policy.json
+resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
+  role       = aws_iam_role.StateMachineRole.id
+  policy_arn = aws_iam_policy.statemachine_logging_policy.arn
 }

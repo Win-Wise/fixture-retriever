@@ -27,6 +27,7 @@ module "first-function" {
   source = "./functions/first-function"
   lambda_role = module.base.lambda_execution_role
   lambda_layer = module.base.lambda_layer
+  zenrows_api_key = var.zenrows_api_key
 }
 
 module "statemachine"{
