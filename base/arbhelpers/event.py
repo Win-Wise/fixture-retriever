@@ -11,7 +11,7 @@ class Event:
 
     def print(self):
         print(
-            f"Home: {self.home}, Away: {self.away} - ID: {self.id}\n - StartTime: {self.start_time}, "
+            f"Home: {self.home}, Away: {self.away} - ID: {self.id} StartTime: {self.start_time}, "
             f"Book: {self.book}")
 
     def to_dict(self):

@@ -1,6 +1,5 @@
 import os
 import dateutil.parser
-import requests
 from dotenv import load_dotenv
 from arbhelpers.arbutils import clean_name, is_valid_event
 from arbhelpers.event import Event
@@ -60,5 +59,6 @@ def get_events(group, sport, days_forward):
 def retrieve_fixtures(days_forward):
     for group_, sport_ in get_groups():
         for event_ in get_events(group_, sport_, days_forward):
-            print(f"Found event: {event_.to_dict()}")
+            print("Found event: ", end="")
+            event_.print()
             yield event_

@@ -26,6 +26,7 @@ def clean_name(name):
 
     # replace common words with synonyms and removing superfluous words
     for token in tokens:
+        token = token.strip()
         if token in synonyms:
             name_string += synonyms[token] + " "
         elif token in bad_words:

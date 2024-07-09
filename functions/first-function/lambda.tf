@@ -17,6 +17,7 @@ resource "aws_lambda_function" "event_scraper" {
   environment {
     variables = {
       MONGODB_URI = "mongodb+srv://tributary-dev.ygqeljj.mongodb.net/arbriver?authSource=$external&authMechanism=MONGODB-AWS"
+      FANDUEL_EVENTS_REQUEST = "https://sbapi.il.sportsbook.fanduel.com/api/content-managed-page?page=SPORT&eventTypeId={sport}&_ak=FhMFpcPWXMeyZxOx&timezone=America%2FChicago"
       CAESARS_EVENTS_REQUEST= "https://api.americanwagering.com/regions/us/locations/il/brands/czr/sb/v3/sports/{sport}/events/schedule"
       DRAFTKINGS_EVENTS_REQUEST= "https://sportsbook-nash-usil.draftkings.com/sites/US-IL-SB/api/v5/eventgroups/{group}?format=json"
       DRAFTKINGS_GROUPS_REQUEST= "https://sportsbook-nash-usil.draftkings.com/sites/US-IL-SB/api/v2/displaygroupinfo?format=json"

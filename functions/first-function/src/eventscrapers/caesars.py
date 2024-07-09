@@ -2,11 +2,11 @@ import os
 import dateutil.parser
 from arbhelpers.arbutils import clean_name, is_valid_event
 from arbhelpers.event import Event
-import requests
 from dotenv import load_dotenv
+from curl_cffi import requests
 
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     "Connection": "keep-alive",
     "Accept": "application/json",
     "Accept-Encoding": "gzip, deflate, br",
@@ -26,7 +26,7 @@ def get_participants(event_string):
 
 def get_events(sport, days_forward):
     url = os.environ.get("CAESARS_EVENTS_REQUEST").format(sport=supported_sports.get(sport))
-    response = requests.get(url, proxies=proxies, headers=headers, verify=False)
+    response = requests.get(url, impersonate="chrome124", headers=headers, proxies=proxies, verify=False)
     response.raise_for_status()
     for competition in response.json()['competitions']:
         for event in competition['events']:
@@ -40,6 +40,7 @@ def get_events(sport, days_forward):
 def retrieve_fixtures(days_forward):
     for sport_ in supported_sports.keys():
         for event_ in get_events(sport_, days_forward):
-            print(f"Found event: {event_.to_dict()}")
+            print("Found event: ", end="")
+            event_.print()
             yield event_
 
