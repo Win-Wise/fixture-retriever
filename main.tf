@@ -39,5 +39,6 @@ module "first-function" {
 
 module "statemachine"{
   source = "./statemachine"
-  processing_lambda = module.first-function
+  processing_lambda = module.first-function.lambda
+  populator_lambda = module.fixture-populator.lambda
 }

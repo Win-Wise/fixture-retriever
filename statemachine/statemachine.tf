@@ -2,7 +2,8 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
   name     = "fixture-retriever-statemachine"
   role_arn = aws_iam_role.StateMachineRole.arn
   definition = templatefile("${path.module}/statemachine.asl.json", {
-    ProcessingLambda = var.processing_lambda.lambda.arn
+    ProcessingLambda = var.processing_lambda.arn,
+    PopulatingLambda = var.populator_lambda.arn
   }
   )
   logging_configuration {

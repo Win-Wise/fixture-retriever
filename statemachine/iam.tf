@@ -53,7 +53,10 @@ resource "aws_iam_policy" "statemachine_logging_policy" {
           "lambda:InvokeFunction"
         ],
         Effect: "Allow",
-        Resource: var.processing_lambda.lambda.arn
+        Resource: [
+          var.processing_lambda.arn,
+          var.populator_lambda.arn
+        ]
       }
     ]
   })

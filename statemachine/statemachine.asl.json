@@ -1,30 +1,41 @@
 {
-    "Comment": "State machine description",
-    "StartAt": "Lambda Invoke",
-    "States": {
-        "Lambda Invoke": {
-          "Type": "Map",
-          "ItemsPath": "$.books",
-          "MaxConcurrency": 0,
-          "ItemSelector": {
-            "book.$": "$$.Map.Item.Value",
-            "days_forward.$": "$.days_forward"
-          },
-          "ItemProcessor": {
-            "StartAt": "Validate",
-            "States": {
-              "Validate": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                    "Payload.$": "$",
-                    "FunctionName": "${ProcessingLambda}"
-                },
-                "End": true
-              }
-            }
-          },
-          "End": true
+  "Comment": "State machine description",
+  "StartAt": "TriggerScrapeBooks",
+  "States": {
+    "TriggerScrapeBooks": {
+      "Type": "Map",
+      "ItemsPath": "$.books",
+      "MaxConcurrency": 0,
+      "ItemSelector": {
+        "book.$": "$$.Map.Item.Value",
+        "days_forward.$": "$.days_forward"
+      },
+      "ItemProcessor": {
+        "StartAt": "ScrapeBooks",
+        "States": {
+          "ScrapeBooks": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "${ProcessingLambda}"
+            },
+            "End": true
+          }
         }
+      },
+      "Next": "PopulateFixtures",
+      "ResultPath": null
+    },
+    "PopulateFixtures": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "${PopulatingLambda}"
+      },
+      "End": true
     }
+  }
 }

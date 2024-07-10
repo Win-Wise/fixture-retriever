@@ -13,7 +13,7 @@ resource "aws_lambda_function" "fixture_populator" {
   filename         = "functions/fixture-populator/lambda.zip"
   source_code_hash = data.archive_file.lambda.output_base64sha256
   layers           = [var.lambda_layer.arn]
-  timeout          = 450
+  timeout          = 600
   environment {
     variables = {
       MONGODB_URI = "mongodb+srv://tributary-dev.ygqeljj.mongodb.net/arbriver?authSource=$external&authMechanism=MONGODB-AWS"
