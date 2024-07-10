@@ -23,6 +23,13 @@ module "base"{
   source = "./base"
 }
 
+module "fixture-populator" {
+  source = "./functions/fixture-populator"
+  lambda_role = module.base.lambda_execution_role
+  lambda_layer = module.base.lambda_layer
+  rapidapi_api_key = var.rapidapi_api_key
+}
+
 module "first-function" {
   source = "./functions/first-function"
   lambda_role = module.base.lambda_execution_role

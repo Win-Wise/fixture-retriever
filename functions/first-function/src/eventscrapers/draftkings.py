@@ -2,7 +2,8 @@ import os
 import dateutil.parser
 from dotenv import load_dotenv
 from arbhelpers.arbutils import clean_name, is_valid_event
-from arbhelpers.event import Event
+from arbhelpers.event import BookEvent
+from curl_cffi import requests
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
@@ -16,7 +17,7 @@ load_dotenv()
 
 def req_with_retry(url, retry_num):
     try:
-        response = requests.get(url, headers=headers, timeout=5)
+        response = requests.get(url, impersonate="chrome",headers=headers, timeout=5)
         response.raise_for_status()
         return response.json()
     except Exception as e:
@@ -42,7 +43,7 @@ def get_events(group, sport, days_forward):
     response = req_with_retry(url, retry_num=0)
     for event in response['eventGroup']['events']:
         if 'teamName1' in event:
-            e = Event(clean_name(event['teamName1']),
+            e = BookEvent(clean_name(event['teamName1']),
                       clean_name(event['teamName2']),
                       sport.lower(), event['eventId'],
                       'DRAFTKINGS')

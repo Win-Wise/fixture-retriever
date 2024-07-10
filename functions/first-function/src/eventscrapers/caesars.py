@@ -1,7 +1,7 @@
 import os
 import dateutil.parser
 from arbhelpers.arbutils import clean_name, is_valid_event
-from arbhelpers.event import Event
+from arbhelpers.event import BookEvent
 from dotenv import load_dotenv
 from curl_cffi import requests
 
@@ -31,7 +31,7 @@ def get_events(sport, days_forward):
     for competition in response.json()['competitions']:
         for event in competition['events']:
             home, away = get_participants(event['name'])
-            e = Event(home, away, sport.lower(), event['id'], 'CAESARS')
+            e = BookEvent(home, away, sport.lower(), event['id'], 'CAESARS')
             e.start_time = dateutil.parser.isoparse(event['startTime'])
             if is_valid_event(e, days_forward):
                 yield e
