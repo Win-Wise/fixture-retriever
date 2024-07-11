@@ -1,7 +1,7 @@
 import os
 import dateutil.parser
 from dotenv import load_dotenv
-from arbhelpers.arbutils import clean_name, is_valid_event
+from arbhelpers.arbutils import is_valid_event
 from arbhelpers.event import BookEvent
 from curl_cffi import requests
 
@@ -43,8 +43,8 @@ def get_events(group, sport, days_forward):
     response = req_with_retry(url, retry_num=0)
     for event in response['eventGroup']['events']:
         if 'teamName1' in event:
-            e = BookEvent(clean_name(event['teamName1']),
-                      clean_name(event['teamName2']),
+            e = BookEvent(event['teamName1'],
+                      event['teamName2'],
                       sport.lower(), event['eventId'],
                       'DRAFTKINGS')
             e.start_time = dateutil.parser.isoparse(event['startDate'])

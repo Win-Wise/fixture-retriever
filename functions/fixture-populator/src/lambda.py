@@ -14,10 +14,10 @@ def lambda_handler(event, context):
         e_dict = event_.to_dict()
         e_dict['text_embedding'] = embedding
         matches = get_match_links(e_dict)
-        if len(matches.keys()) > 0:
+        if len(matches) > 0:
             e_dict['links'] = matches
             del e_dict['text_embedding']
-            print(f"Found {len(matches.keys())} bookmaker items for event: {e_dict['text']}")
+            print(f"Found {len(matches)} bookmaker items for event: {e_dict['text']}")
             matches_coll.replace_one({"_id": e_dict["_id"]}, e_dict, upsert=True)
         else:
             print(f"No bookmaker items for event: {e_dict['text']}, skipping...")

@@ -1,3 +1,6 @@
+from arbhelpers.arbutils import clean_name
+
+
 class Event:
     def __init__(self, home, away, sport, id_):
         self.id = id_
@@ -5,7 +8,7 @@ class Event:
         self.home = home
         self.away = away
         self.start_time = None
-        self.text = home + ' vs ' + away
+        self.text = clean_name(home) + ' vs ' + clean_name(away)
 
     def print(self):
         print(

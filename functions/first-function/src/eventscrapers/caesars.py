@@ -1,6 +1,6 @@
 import os
 import dateutil.parser
-from arbhelpers.arbutils import clean_name, is_valid_event
+from arbhelpers.arbutils import is_valid_event
 from arbhelpers.event import BookEvent
 from dotenv import load_dotenv
 from curl_cffi import requests
@@ -19,9 +19,9 @@ load_dotenv()
 
 
 def get_participants(event_string):
-    event_string = event_string.replace("|", "").strip()
+    event_string = event_string.replace("|", "")
     home, away = event_string.split("vs")
-    return clean_name(home), clean_name(away)
+    return home.strip(), away.strip()
 
 
 def get_events(sport, days_forward):

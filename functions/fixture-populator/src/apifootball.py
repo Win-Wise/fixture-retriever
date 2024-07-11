@@ -12,7 +12,7 @@ url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
 
 
 def generate_id(home_team, away_team, sport, start_time):
-    return str(abs(hash((home_team, away_team, sport, start_time))))
+    return str(abs(hash((home_team, away_team, sport, start_time.isoformat()))))
 
 
 def get_events(days_forward):

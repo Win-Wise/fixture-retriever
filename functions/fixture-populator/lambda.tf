@@ -18,6 +18,7 @@ resource "aws_lambda_function" "fixture_populator" {
     variables = {
       MONGODB_URI = "mongodb+srv://tributary-dev.ygqeljj.mongodb.net/arbriver?authSource=$external&authMechanism=MONGODB-AWS"
       RAPIDAPI_KEY = var.rapidapi_api_key
+      PYTHONHASHSEED = 143
     }
   }
 }

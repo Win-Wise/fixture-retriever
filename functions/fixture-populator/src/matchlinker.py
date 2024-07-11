@@ -41,7 +41,7 @@ def get_match_links(event_dict):
         }
     ]
     result = fixtures_coll.aggregate(pipeline)
-    matches = {}
+    matches = []
 
     start_time = event_dict['start_time'].astimezone(timezone.utc)
     num_candidates = 0
@@ -51,25 +51,27 @@ def get_match_links(event_dict):
         link = {
             'event_id': i['_id'],
             'score': i['score'],
-            'text': i['text']
+            'text': i['text'],
+            'start_time': candidate_start_time,
+            'book': i['book'],
+            'home': i['home'],
+            'away': i['away'],
         }
+
         if i['score'] >= 0.95: #exact match
             upper_bound = start_time + timedelta(hours=12)
             lower_bound = start_time - timedelta(hours=12)
             if upper_bound > candidate_start_time > lower_bound:
-                if i['book'] not in matches:
-                    matches[i['book']] = link
+                matches.append(link)
         elif i['score'] > 0.8: #good match
             upper_bound = start_time + timedelta(hours=2)
             lower_bound = start_time - timedelta(hours=2)
             if upper_bound > candidate_start_time > lower_bound:
-                if i['book'] not in matches:
-                    matches[i['book']] = link
+                matches.append(link)
         elif i['score'] > 0.65: #decent match
             upper_bound = start_time + timedelta(minutes=30)
             lower_bound = start_time - timedelta(minutes=30)
             if upper_bound > candidate_start_time > lower_bound:
                 if i['home'] == event_dict['home'] or i['away'] == event_dict['away']:
-                    if i['book'] not in matches:
-                        matches[i['book']] = link
+                    matches.append(link)
     return matches
