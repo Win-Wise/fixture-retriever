@@ -36,7 +36,7 @@ def get_events_page(page_json, sport, days_forward):
             home = away
             away = temp
         start_time = dateutil.parser.isoparse(fixture['start'])
-        event = BookEvent(clean_name(home['name']), clean_name(away['name']), sport, fixture['id'], "BETRIVERS")
+        event = BookEvent(clean_name(home['name']), clean_name(away['name']), sport, str(fixture['id']), "BETRIVERS")
         event.start_time = start_time
         if is_valid_event(event, days_forward):
             yield event
