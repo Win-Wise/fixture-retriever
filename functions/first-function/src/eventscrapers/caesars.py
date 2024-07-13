@@ -2,6 +2,7 @@ import os
 import dateutil.parser
 from arbhelpers.arbutils import is_valid_event
 from arbhelpers.event import BookEvent
+from arbhelpers.requesthelper import make_request
 from dotenv import load_dotenv
 from curl_cffi import requests
 
@@ -26,9 +27,8 @@ def get_participants(event_string):
 
 def get_events(sport, days_forward):
     url = os.environ.get("CAESARS_EVENTS_REQUEST").format(sport=supported_sports.get(sport))
-    response = requests.get(url, impersonate="chrome124", headers=headers, proxies=proxies, verify=False)
-    response.raise_for_status()
-    for competition in response.json()['competitions']:
+    response = make_request(url=url, use_proxy=True, headers={'X-Platform': 'cordova-desktop'})
+    for competition in response['competitions']:
         for event in competition['events']:
             home, away = get_participants(event['name'])
             e = BookEvent(home, away, sport.lower(), event['id'], 'CAESARS')
