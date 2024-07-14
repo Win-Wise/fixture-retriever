@@ -1,6 +1,13 @@
 from arbhelpers.arbutils import clean_name
 
 
+class BetType:
+    def __init__(self, name, ordinal, participant=None):
+        self.name = name
+        self.ordinal = ordinal
+        self.participant = participant
+
+
 class Event:
     def __init__(self, home, away, sport, id_):
         self.id = id_

@@ -1,4 +1,7 @@
 import os
+from urllib import parse
+from json import JSONDecodeError
+
 from curl_cffi import requests
 
 default_headers = {
@@ -8,31 +11,53 @@ default_headers = {
     "Accept-Encoding": "gzip, deflate, br",
 }
 
-proxy = f"http://{os.environ.get('ZR_API_KEY')}:premium_proxy=true&custom_headers=true@proxy.zenrows.com:8001"
-proxies = {"http": proxy, "https": proxy}
+
+def generate_proxies(proxy_settings):
+    base = f"http://{os.environ.get('ZR_API_KEY')}:custom_headers=true"
+    suffix = "@proxy.zenrows.com:8001"
+    if not proxy_settings['enabled']:
+        return None
+    else:
+        if 'params' in proxy_settings:
+            proxy = base + "&" + parse.urlencode(proxy_settings['params']) + suffix
+        else:
+            proxy = base + suffix
+        return {"http": proxy, "https": proxy}
 
 
-def make_request(url, use_proxy=False, headers=None):
-    return req_with_retry(url=url, retry_num=0, use_proxy=use_proxy, headers=headers)
+def make_request(url, proxy_settings=None, headers=None):
+    if proxy_settings is None:
+        proxies = None
+    else:
+        proxies = generate_proxies(proxy_settings)
 
-
-def req_with_retry(url, retry_num, use_proxy=False, headers=None):
     if headers is None:
         request_headers = default_headers
     else:
         request_headers = dict(default_headers)
         request_headers.update(headers)
+
+    return req_with_retry(url=url, retry_num=0, proxies=proxies, request_headers=request_headers)
+
+
+def req_with_retry(url, retry_num, proxies=None, request_headers=None):
     try:
-        if use_proxy:
+        print(f"Requesting url: {url} with proxy: {proxies} and headers: {request_headers}")
+        if proxies is not None:
             response = requests.get(url, impersonate="chrome124", headers=request_headers, proxies=proxies, verify=False)
         else:
-            response = requests.get(url, impersonate="chrome", headers=headers, timeout=5)
+            response = requests.get(url, impersonate="chrome", headers=request_headers, timeout=5)
         response.raise_for_status()
-        return response.json()
+        try:
+            resp_page = response.json()
+            return resp_page
+        except JSONDecodeError as jse:
+            print(f"Error: {jse.msg}, could not parse body as json for request with status: {response.status_code}:\n{response}")
+            raise Exception
     except Exception as e:
         if retry_num < 3:
             print(f"Exception while accessing url: {url}, retrying...")
-            return req_with_retry(url, retry_num + 1, use_proxy=use_proxy, headers=headers)
+            return req_with_retry(url, retry_num + 1, proxies=proxies, request_headers=request_headers)
         else:
             print(f"ERROR. Retries exceeded for url {url}")
             raise e
