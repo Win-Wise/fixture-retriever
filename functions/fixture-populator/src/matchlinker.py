@@ -58,6 +58,8 @@ def get_match_links(event_dict):
             'text': i['text'],
             'start_time': candidate_start_time,
             'book': i['book'],
+            'home': i['home'],
+            'away': i['away']
         }
         if 'hyperlink' in i:
             link['hyperlink'] = i['hyperlink']
@@ -79,13 +81,7 @@ def get_match_links(event_dict):
                 if i['home'] == event_dict['home'] or i['away'] == event_dict['away']:
                     is_link = True
 
-        if is_link:
-            home, away = i['home'], i['away']
-            if i['book'] == 'CAESARS': #sometimes caesars flips the home and away teams
-                home, away = reconcile_sides(i, event_dict)
-
-            link['home'] = home
-            link['away'] = away
+        if is_link and reconcile_sides(i, event_dict):
             matches.append(link)
 
     return matches
@@ -94,8 +90,10 @@ def get_match_links(event_dict):
 def reconcile_sides(matched, fixture):
     home_to_home = rapidfuzz.fuzz.QRatio(clean_name(matched['home'].replace("women", "")), clean_name(fixture['home'].replace("women", "")))
     home_to_away = rapidfuzz.fuzz.QRatio(clean_name(matched['home'].replace("women", "")), clean_name(fixture['away'].replace("women", "")))
-    if home_to_home >= home_to_away:
-        return matched['home'], matched['away']
+    away_to_away = rapidfuzz.fuzz.QRatio(clean_name(matched['away'].replace("women", "")), clean_name(fixture['away'].replace("women", "")))
+
+    if home_to_home <= home_to_away and away_to_away <= home_to_away:
+        print(f"{matched['home']} vs {matched['away']} and {fixture['home']} vs {fixture['away']} are flipped on {matched['book']}. Discarding...")
+        return False
     else:
-        print(f"{matched['home']} vs {matched['away']} and {fixture['home']} vs {fixture['away']} are flipped on {matched['book']}. Flipping back...")
-        return matched['away'], matched['home']
+        return True
