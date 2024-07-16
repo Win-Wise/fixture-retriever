@@ -22,6 +22,8 @@ def get_events(sport, days_forward):
         for event in competition['events']:
             home, away = get_participants(event['name'])
             e = BookEvent(home, away, sport.lower(), event['id'], 'CAESARS')
+            link_text = (home + "-vs-" + away).replace(" ","-")
+            e.hyperlink = f"https://sportsbook.caesars.com/us/il/bet/football/{event['id']}/{link_text}"
             e.start_time = dateutil.parser.isoparse(event['startTime'])
             if is_valid_event(e, days_forward):
                 yield e

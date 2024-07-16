@@ -56,8 +56,19 @@ def req_with_retry(url, retry_num, proxies=None, request_headers=None):
             raise Exception
     except Exception as e:
         if retry_num < 3:
-            print(f"Exception while accessing url: {url}, retrying...")
+            print(f"Exception {e} while accessing url: {url}, retrying...")
             return req_with_retry(url, retry_num + 1, proxies=proxies, request_headers=request_headers)
+        elif retry_num == 3 and proxies is None:
+            print(f"Exception {e} while accessing url: {url}. Last retry, trying with proxy...")
+            return req_with_retry(url, retry_num + 1,
+                                  proxies=generate_proxies({
+                                      'enabled': True,
+                                      'params': {
+                                          'premium_proxy': True,
+                                          'proxy_country': 'us'
+                                      }
+                                  }),
+                                  request_headers=request_headers)
         else:
             print(f"ERROR. Retries exceeded for url {url}")
             raise e

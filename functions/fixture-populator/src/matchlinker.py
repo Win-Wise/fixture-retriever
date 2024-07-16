@@ -1,6 +1,8 @@
 import os
 from datetime import timedelta, timezone
+from arbhelpers.arbutils import clean_name
 from pymongo import MongoClient
+import rapidfuzz
 
 # connect to your Atlas cluster
 client = MongoClient(host=os.environ["MONGODB_URI"])
@@ -33,6 +35,7 @@ def get_match_links(event_dict):
                 'text': 1,
                 'home': 1,
                 'away': 1,
+                'hyperlink': 1,
                 'start_time': 1,
                 'score': {
                     '$meta': 'vectorSearchScore'
@@ -46,6 +49,7 @@ def get_match_links(event_dict):
     start_time = event_dict['start_time'].astimezone(timezone.utc)
     num_candidates = 0
     for i in result:
+        is_link = False
         num_candidates += 1
         candidate_start_time = i['start_time'].astimezone(timezone.utc)
         link = {
@@ -54,24 +58,44 @@ def get_match_links(event_dict):
             'text': i['text'],
             'start_time': candidate_start_time,
             'book': i['book'],
-            'home': i['home'],
-            'away': i['away'],
         }
+        if 'hyperlink' in i:
+            link['hyperlink'] = i['hyperlink']
 
         if i['score'] >= 0.95: #exact match
             upper_bound = start_time + timedelta(hours=12)
             lower_bound = start_time - timedelta(hours=12)
             if upper_bound > candidate_start_time > lower_bound:
-                matches.append(link)
+                is_link = True
         elif i['score'] > 0.8: #good match
             upper_bound = start_time + timedelta(hours=2)
             lower_bound = start_time - timedelta(hours=2)
             if upper_bound > candidate_start_time > lower_bound:
-                matches.append(link)
+                is_link = True
         elif i['score'] > 0.65: #decent match
             upper_bound = start_time + timedelta(minutes=30)
             lower_bound = start_time - timedelta(minutes=30)
             if upper_bound > candidate_start_time > lower_bound:
                 if i['home'] == event_dict['home'] or i['away'] == event_dict['away']:
-                    matches.append(link)
+                    is_link = True
+
+        if is_link:
+            home, away = i['home'], i['away']
+            if i['book'] == 'CAESARS': #sometimes caesars flips the home and away teams
+                home, away = reconcile_sides(i, event_dict)
+
+            link['home'] = home
+            link['away'] = away
+            matches.append(link)
+
     return matches
+
+
+def reconcile_sides(matched, fixture):
+    home_to_home = rapidfuzz.fuzz.QRatio(clean_name(matched['home'].replace("women", "")), clean_name(fixture['home'].replace("women", "")))
+    home_to_away = rapidfuzz.fuzz.QRatio(clean_name(matched['home'].replace("women", "")), clean_name(fixture['away'].replace("women", "")))
+    if home_to_home >= home_to_away:
+        return matched['home'], matched['away']
+    else:
+        print(f"{matched['home']} vs {matched['away']} and {fixture['home']} vs {fixture['away']} are flipped on {matched['book']}. Flipping back...")
+        return matched['away'], matched['home']

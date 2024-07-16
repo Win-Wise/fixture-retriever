@@ -17,6 +17,7 @@ def get_events_page(page_json, sport, days_forward):
             away = temp
         start_time = dateutil.parser.isoparse(fixture['start'])
         event = BookEvent(home['name'], away['name'], sport.lower(), str(fixture['id']), "BETRIVERS")
+        event.hyperlink = f"https://il.betrivers.com/?page=sportsbook#event/{str(fixture['id'])}"
         event.start_time = start_time
         if is_valid_event(event, days_forward):
             yield event

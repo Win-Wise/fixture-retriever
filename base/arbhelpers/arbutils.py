@@ -7,7 +7,9 @@ ai_client = boto3.client("bedrock-runtime", region_name="us-east-1")
 model_id = "amazon.titan-embed-text-v2:0"
 
 synonyms = {
-    "w": "women"
+    "w": "women",
+    "(women)": "women",
+    "[w]": "women"
 }
 
 bad_words = [
@@ -44,7 +46,6 @@ def is_valid_event(event, days_forward):
 
 def clean_name(name):
     name = name.lower()
-    name = name.replace("[w]", "women")
     name = unidecode(name)
     tokens = name.split()
     name_string = ""

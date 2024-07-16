@@ -28,6 +28,8 @@ def get_events(group, sport, days_forward):
                       sport.lower(), event['eventId'],
                       'DRAFTKINGS')
             e.start_time = dateutil.parser.isoparse(event['startDate'])
+            link_text = (event['teamName1'] + "-vs-" + event['teamName2']).replace(" ","-")
+            e.hyperlink = f"https://sportsbook.draftkings.com/event/{link_text}/{e.id}"
             if 'mediaList' in event:
                 for media in event['mediaList']:
                     if "betradar" in media['mediaProviderName'].lower():

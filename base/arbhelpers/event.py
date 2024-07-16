@@ -36,6 +36,7 @@ class BookEvent(Event):
     def __init__(self, home, away, sport, id_, book):
         Event.__init__(self, home, away, sport, id_)
         self.book = book
+        self.hyperlink = None
         self.betradar_id = None
 
     def print(self):
@@ -51,6 +52,7 @@ class BookEvent(Event):
             "start_time": self.start_time,
             "book": self.book,
             "betradar_id": self.betradar_id,
+            "hyperlink": self.hyperlink,
             "text": self.text,
             "_id": self.id
         }
