@@ -21,6 +21,8 @@ provider "aws" {
 
 module "base"{
   source = "./base"
+  betfair_password_secret = aws_secretsmanager_secret.betfair_password
+  betfair_app_key_secret = aws_secretsmanager_secret.betfair_app_key
 }
 
 module "fixture-populator" {
