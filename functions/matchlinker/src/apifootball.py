@@ -4,10 +4,6 @@ from arbhelpers.arbutils import clean_name, is_valid_event, next_n_days
 from arbhelpers.event import Event
 from datetime import datetime
 
-headers = {
-    'x-rapidapi-key': os.environ["RAPIDAPI_KEY"],
-    'x-rapidapi-host': "api-football-v1.p.rapidapi.com"
-}
 url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
 
 
@@ -16,6 +12,10 @@ def generate_id(home_team, away_team, sport, start_time):
 
 
 def get_events(days_forward):
+    headers = {
+        'x-rapidapi-key': os.environ["RAPIDAPI_API_KEY"],
+        'x-rapidapi-host': "api-football-v1.p.rapidapi.com"
+    }
     for d in next_n_days(days_forward):
         querystring = {"date": f"{d:%Y-%m-%d}", "status": "NS"}
         response = requests.get(url, impersonate="chrome", headers=headers, params=querystring).json()

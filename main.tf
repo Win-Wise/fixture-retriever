@@ -19,28 +19,38 @@ provider "aws" {
   region = "us-east-1"
 }
 
-module "base"{
-  source = "./base"
-  betfair_password_secret = aws_secretsmanager_secret.betfair_password
-  betfair_app_key_secret = aws_secretsmanager_secret.betfair_app_key
+data "terraform_remote_state" "base_workspace" {
+  backend = "remote"
+
+  config = {
+    organization = "arbriver"
+
+    workspaces = {
+      name = "arbriver-infra-base"
+    }
+  }
 }
 
-module "fixture-populator" {
-  source = "./functions/fixture-populator"
-  lambda_role = module.base.lambda_execution_role
-  lambda_layer = module.base.lambda_layer
-  rapidapi_api_key = var.rapidapi_api_key
+module "match-linker" {
+  source = "./functions/matchlinker"
+  lambda_role = data.terraform_remote_state.base_workspace.outputs.lambda_execution_role
+  lambda_layer = data.terraform_remote_state.base_workspace.outputs.lambda_base_layer
+  rapidapi_api_key_secret = data.terraform_remote_state.base_workspace.outputs.rapidapi_api_key_secret
 }
 
-module "first-function" {
-  source = "./functions/first-function"
-  lambda_role = module.base.lambda_execution_role
-  lambda_layer = module.base.lambda_layer
-  zenrows_api_key = var.zenrows_api_key
+module "event-scraper" {
+  source = "./functions/eventscraper"
+  lambda_role = data.terraform_remote_state.base_workspace.outputs.lambda_execution_role
+  lambda_layer = data.terraform_remote_state.base_workspace.outputs.lambda_base_layer
+  zenrows_api_key_secret = data.terraform_remote_state.base_workspace.outputs.zenrows_api_key_secret
+  betfair_app_key_secret = data.terraform_remote_state.base_workspace.outputs.betfair_app_key_secret
+  betfair_password_secret = data.terraform_remote_state.base_workspace.outputs.betfair_password_secret
+  uk_https_proxy_secret = data.terraform_remote_state.base_workspace.outputs.uk_https_proxy_secret
 }
 
 module "statemachine"{
   source = "./statemachine"
-  processing_lambda = module.first-function.lambda
-  populator_lambda = module.fixture-populator.lambda
+  statemachine_role = data.terraform_remote_state.base_workspace.outputs.statemachine_execution_role
+  processing_lambda = module.event-scraper.lambda
+  populator_lambda = module.match-linker.lambda
 }

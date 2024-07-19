@@ -2,11 +2,14 @@ from apifootball import get_events
 from arbhelpers.arbutils import get_embedding
 from matchlinker import get_match_links
 from pymongo import MongoClient
+import boto3
 import os
 
 client = MongoClient(host=os.environ["MONGODB_URI"])
 matches_coll = client['arbriver']['matches']
 
+secrets_client = boto3.client(service_name='secretsmanager', region_name='us-east-1')
+os.environ['RAPIDAPI_API_KEY'] = secrets_client.get_secret_value(SecretId=os.environ['RAPIDAPI_API_KEY_SECRET']).get('SecretString')
 
 def lambda_handler(event, context):
     for event_ in get_events(event['days_forward']):

@@ -8,7 +8,7 @@ variable "lambda_layer" {
   description = "the lambda layer used"
 }
 
-variable "rapidapi_api_key" {
-  type = string
+variable "rapidapi_api_key_secret" {
+  type = any
   description = "the api key for using the rapidapi service"
 }
