@@ -64,7 +64,10 @@ def retrieve_fixtures(days_forward: int):
             except Exception as e:
                 print(e)
                 continue
-            yield BookEvent(home, away, sport_name, event['event']['id'], 'BETFAIR')
+            ev = BookEvent(home, away, sport_name, event['event']['id'], 'BETFAIR')
+            ev.start_time = datetime.fromisoformat(event['event']['openDate'][:-1])
+            yield ev
+            
 
     trading.logout()
 
