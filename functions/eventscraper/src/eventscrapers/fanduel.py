@@ -17,7 +17,7 @@ def get_participants(event_string):
 
 def get_events(sport, days_forward):
     url = os.environ.get("FANDUEL_EVENTS_REQUEST").format(sport=supported_sports.get(sport))
-    response = make_request(url)
+    response = make_request(url=url, proxy_settings={'enabled': True, 'params': {'premium_proxy': True, 'proxy_country': 'us'}})
     comp_map = {competition_id: competition['name'].lower().replace(" ", "-") for competition_id, competition in response['attachments']['competitions'].items()}
     for event_id, event in response['attachments']['events'].items():
         #home, away, sport, id, book
