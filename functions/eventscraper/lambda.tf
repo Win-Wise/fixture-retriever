@@ -26,6 +26,7 @@ resource "aws_lambda_function" "event_scraper" {
       BETFAIR_PASSWORD_SECRET = var.betfair_password_secret.arn
       BETFAIR_APP_KEY_SECRET = var.betfair_app_key_secret.arn
       UK_HTTPS_PROXY_SECRET = var.uk_https_proxy_secret.arn
+      ARBRIVER_BUCKET = "arbriver-bucket"
     }
   }
 }
