@@ -11,6 +11,7 @@ matches_coll = client['arbriver']['matches']
 secrets_client = boto3.client(service_name='secretsmanager', region_name='us-east-1')
 os.environ['RAPIDAPI_API_KEY'] = secrets_client.get_secret_value(SecretId=os.environ['RAPIDAPI_API_KEY_SECRET']).get('SecretString')
 
+
 def lambda_handler(event, context):
     for event_ in get_events(event['days_forward']):
         embedding = get_embedding(event_)
