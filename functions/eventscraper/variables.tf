@@ -28,3 +28,7 @@ variable "uk_https_proxy_secret" {
   description = "the proxy secret for using the betfair service"
 }
 
+variable "betfair_username" {
+  type = string
+  description = "the betfair login username"
+}

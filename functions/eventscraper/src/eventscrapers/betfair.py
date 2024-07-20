@@ -1,36 +1,25 @@
 from datetime import datetime, timedelta
+from arbhelpers.event import BookEvent
 import os
-
-import boto3
 import requests
 import betfairlightweight
-
-from arbhelpers.event import BookEvent
-
-proxy = f"https://Iv08hg:KelqtNSB@89-34-98-2.ip.ipb.cloud:9443"
-proxies = {"http": proxy, "https": proxy}
-session = requests.Session()
-session.proxies = proxies
-
-s3 = boto3.resource('s3')
-
-BUCKET_NAME = os.environ['ARBRIVER_BUCKET']
-keys = ['client-2048.crt', 'client-2048.key', 'client-2048.pem']
-for KEY in keys:
-    local_file_name = '/tmp/'+KEY
-    s3.Bucket(BUCKET_NAME).download_file('betfair-certs/' + KEY, local_file_name)
-session.cert = ("/tmp/client-2048.crt", "/tmp/client-2048.key")
-session.verify = False
-
 
 supported_sports = {"soccer": 1}
 
 
-def get_participants(event_string: str):
-    return 
+def initialize_session():
+    proxy = os.environ.get('UK_HTTPS_PROXY')
+    proxies = {"http": proxy, "https": proxy}
+    session = requests.Session()
+    session.proxies = proxies
+
+    session.cert = ("/tmp/client-2048.crt", "/tmp/client-2048.key")
+    session.verify = False
+    return session
 
 
 def retrieve_fixtures(days_forward: int):
+    session = initialize_session()
     events_dict = {}
     
     time_range = {
@@ -38,7 +27,7 @@ def retrieve_fixtures(days_forward: int):
         "to": (datetime.now() + timedelta(days=days_forward)).isoformat(timespec='milliseconds') + 'Z'
     }
     
-    trading = betfairlightweight.APIClient('dannyray44@hotmail.co.uk',
+    trading = betfairlightweight.APIClient(os.environ['BETFAIR_USERNAME'],
                                            os.environ['BETFAIR_PASSWORD'],
                                            app_key=os.environ['BETFAIR_APP_KEY'], 
                                            cert_files=("/tmp/client-2048.crt", "/tmp/client-2048.key"),
@@ -67,11 +56,8 @@ def retrieve_fixtures(days_forward: int):
             ev = BookEvent(home, away, sport_name, event['event']['id'], 'BETFAIR')
             ev.start_time = datetime.fromisoformat(event['event']['openDate'][:-1])
             yield ev
-            
 
     trading.logout()
-
-
 
 
 if __name__ == "__main__":

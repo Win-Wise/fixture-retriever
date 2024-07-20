@@ -22,6 +22,7 @@ resource "aws_lambda_function" "event_scraper" {
       BETRIVERS_EVENTS_REQUEST= "https://il.betrivers.com/api/service/sportsbook/offering/listview/events?cageCode=847&type=prematch&groupId={group}&pageNr={page}&pageSize=20&offset=0"
       DRAFTKINGS_EVENTS_REQUEST= "https://sportsbook-nash-usil.draftkings.com/sites/US-IL-SB/api/v5/eventgroups/{group}?format=json"
       DRAFTKINGS_GROUPS_REQUEST= "https://sportsbook-nash-usil.draftkings.com/sites/US-IL-SB/api/v2/displaygroupinfo?format=json"
+      BETFAIR_USERNAME = var.betfair_username
       ZR_API_KEY_SECRET = var.zenrows_api_key_secret.arn
       BETFAIR_PASSWORD_SECRET = var.betfair_password_secret.arn
       BETFAIR_APP_KEY_SECRET = var.betfair_app_key_secret.arn

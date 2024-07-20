@@ -46,6 +46,7 @@ module "event-scraper" {
   betfair_app_key_secret = data.terraform_remote_state.base_workspace.outputs.betfair_app_key_secret
   betfair_password_secret = data.terraform_remote_state.base_workspace.outputs.betfair_password_secret
   uk_https_proxy_secret = data.terraform_remote_state.base_workspace.outputs.uk_https_proxy_secret
+  betfair_username = var.betfair_username
 }
 
 module "statemachine"{
