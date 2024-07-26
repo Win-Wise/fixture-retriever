@@ -24,7 +24,8 @@ resource "aws_cloudwatch_event_target" "step_function_event_target" {
       "CAESARS",
       "DRAFTKINGS",
       "FANDUEL",
-      "BETRIVERS"
+      "BETRIVERS",
+      "BETFAIR"
     ]
   })
 }
