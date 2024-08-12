@@ -18,7 +18,8 @@ def get_events(sport_key, days_forward):
         league_dict = requests.get(f"https://api.the-odds-api.com/v4/sports/{league}/events",
                                    params={"apiKey": os.environ["THE_ODDS_API_KEY"], "commenceTimeTo": commence_time_to}).json()    # Free
         for fixture in league_dict:
-            e = BookEvent(home=fixture["home_team"], away=fixture["away_team"], sport=sport_key, id_=fixture["id"], book="THEODDSAPI")
+            custom_id = f"{league}-{fixture['id']}"
+            e = BookEvent(home=fixture["home_team"], away=fixture["away_team"], sport=sport_key, id_=custom_id, book="THEODDSAPI")
             e.start_time = datetime.strptime(fixture["commence_time"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
             if is_valid_event(e, days_forward):
                 yield e
