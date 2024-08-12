@@ -4,3 +4,7 @@ target/
 python/
 terraform.tfvars
 .env
+
+.vscode
+functions/eventscraper/src/local_dev.py
+__pycache__
